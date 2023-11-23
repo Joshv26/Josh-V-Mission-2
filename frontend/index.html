@@ -1,0 +1,59 @@
+<!-- HTML code -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Image Tester Not working</title>
+    <style>
+      /* Add the styles here after everything is done */
+    </style>
+</head>
+<body>
+  <h1>Car Image Tester</h1>
+    <input name="image" type="file" id="imageInput" accept="image/*">
+    <button onclick="uploadImage()">Test Car</button>
+    <!-- the div should help with showing the result on the webpage -->
+    <div id="result"></div>
+
+
+<script>
+  function uploadImage() {
+    const input = document.getElementById('imageInput');
+    const file = input.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      console.log('Sending request to /classify endpoint...'); // Log before making the request
+
+      fetch('/https://localhost:4000/classify', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        console.log('Received response from /classify endpoint:', response); // Log the entire response object
+
+        // Check if the response has JSON content
+        if (!response.ok) {
+          console.error('Error:', response.statusText);
+          return Promise.reject('Response not OK');
+        }
+
+        return response.json();
+      })
+      .then(data => {
+        console.log('Received JSON data from server:', data); // Log the parsed JSON data
+
+        const carType = data.carType || 'Unknown';
+        document.getElementById('result').innerText = `Predicted Car Type: ${carType}`;
+      })
+      .catch(error => console.error('Error during fetch:', error)); // Log any errors during the fetch operation
+    } else {
+      alert('Please select an image file.');
+    }
+  }
+</script>
+</body>
+</html>
